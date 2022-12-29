@@ -2,21 +2,19 @@ use plotly;
 use plotly::common::Mode;
 use plotly::{Layout, Plot, Scatter};
 
-use rand::Rng;
 use crate::core::particle::Particle;
 use crate::core::simdata::SimData;
+use rand::Rng;
 
 pub mod core;
 
-use crate::core::vector::{Vector, Position, Velocity};
+use crate::core::vector::{Position, Vector, Velocity};
 use crate::core::verlet_lists::create_verlet_lists;
-
 
 #[derive(Debug)]
 struct Universe {
     sim_data: SimData,
 }
-
 
 fn main() {
     let mut rng = rand::thread_rng();
@@ -25,9 +23,14 @@ fn main() {
     let mut particles = Vec::new();
     for _i in 0..10 {
         let mut p = Particle::new();
-        p
-            .set_position(Vector { x: random(), y: random() })
-            .set_velocity(Vector { x: random() - 5.0, y: random() - 5.0 });
+        p.set_position(Vector {
+            x: random(),
+            y: random(),
+        })
+        .set_velocity(Vector {
+            x: random() - 5.0,
+            y: random() - 5.0,
+        });
         particles.push(p);
     }
 
@@ -38,11 +41,12 @@ fn main() {
     }
 
     let verlet_lists = create_verlet_lists(&sim_data, 0.1);
-    println!("Number of lists in the verlet lists: {}", verlet_lists.verlet_lists.len());
+    println!(
+        "Number of lists in the verlet lists: {}",
+        verlet_lists.verlet_lists.len()
+    );
 
-    for (id, neighbors) in verlet_lists.verlet_lists {
-
-    }
+    for (id, neighbors) in verlet_lists.verlet_lists {}
 
     let mut x = Vec::new();
     let mut y = Vec::new();
@@ -50,9 +54,7 @@ fn main() {
         x.push(sim_data.positions[i as usize].x);
         y.push(sim_data.positions[i as usize].y);
     }
-    let trace = Scatter::new(x, y)
-        .name("My trace")
-        .mode(Mode::Markers);
+    let trace = Scatter::new(x, y).name("My trace").mode(Mode::Markers);
 
     let mut plot = Plot::new();
     plot.add_trace(trace);

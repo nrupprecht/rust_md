@@ -1,4 +1,4 @@
-use crate::core::vector::{Vector, Position, Velocity, Force};
+use crate::core::vector::{Force, Position, Vector, Velocity};
 
 /// A structure that represents a single particle.
 pub struct Particle {
@@ -7,18 +7,19 @@ pub struct Particle {
     pub mass: f32,
     pub velocity: Velocity,
 
-    pub force: Force
+    pub force: Force,
 }
 
 impl Particle {
     /// Create a new particle, with default information.
-    pub fn new() -> Self{
-        Particle{
+    pub fn new() -> Self {
+        Particle {
             position: Vector::zero(),
             radius: 1.,
             mass: 1.,
             velocity: Vector::zero(),
-            force: Vector::zero() }
+            force: Vector::zero(),
+        }
     }
 
     /// Set the position of a particle. Allows for chaining.
@@ -58,7 +59,10 @@ mod tests {
     #[test]
     fn test_particle_construction() {
         let mut particle = Particle::new();
-        particle.set_radius(2.34).set_velocity(Velocity{x: 1.2, y: 2.5}).set_mass(1.77);
+        particle
+            .set_radius(2.34)
+            .set_velocity(Velocity { x: 1.2, y: 2.5 })
+            .set_mass(1.77);
         assert_eq!(particle.radius, 2.34);
         assert_eq!(particle.velocity.x, 1.2);
         assert_eq!(particle.velocity.y, 2.5);

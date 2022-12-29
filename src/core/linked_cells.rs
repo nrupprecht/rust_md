@@ -1,6 +1,6 @@
-use std::cmp::max;
-use crate::core::vector::{Position};
 use crate::core::simdata::{Bounds, SimData};
+use crate::core::vector::Position;
+use std::cmp::max;
 
 #[derive(Debug, Clone)]
 pub struct Cell {
@@ -46,7 +46,12 @@ impl LinkedCells {
         LinkedCells {
             num_x,
             num_y,
-            cells: vec![Cell { particle_ids: vec![] }; num_cells as usize],
+            cells: vec![
+                Cell {
+                    particle_ids: vec![]
+                };
+                num_cells as usize
+            ],
             bounds,
             cell_width,
             cell_height,
@@ -71,7 +76,8 @@ impl LinkedCells {
         if (dx < 0 && x < -dx as usize)
             || (dy < 0 && y < -dy as usize)
             || (0 < dx && self.num_x < x + dx as usize)
-            || (0 < dy && self.num_y < y + dy as usize) {
+            || (0 < dy && self.num_y < y + dy as usize)
+        {
             return None;
         }
 
@@ -86,7 +92,11 @@ impl LinkedCells {
             return None;
         }
         let index = self.num_x * y + x;
-        Some(self.cells.get_mut(index as usize).expect("Could not get cell"))
+        Some(
+            self.cells
+                .get_mut(index as usize)
+                .expect("Could not get cell"),
+        )
     }
 
     /// Get what cell a position falls inside.
@@ -101,12 +111,13 @@ impl LinkedCells {
     /// Returns the cell into which the particle was added.
     pub fn add_particle(&mut self, position: &Position, id: usize) -> &mut Cell {
         let (ix, iy) = self.get_cell_indices(position.x, position.y);
-        let mut cell = self.get_mut_cell(ix, iy).expect("A particle must belong to some cell");
+        let mut cell = self
+            .get_mut_cell(ix, iy)
+            .expect("A particle must belong to some cell");
         cell.particle_ids.push(id);
         cell
     }
 }
-
 
 // =================================================================================================
 //  Unit Tests.

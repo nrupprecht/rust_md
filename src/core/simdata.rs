@@ -1,10 +1,13 @@
 use crate::core::particle::Particle;
-use crate::core::vector::{Vector, Position, Velocity, Force};
+use crate::core::vector::{Force, Position, Vector, Velocity};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Bounds {
     /// The low and high bounds in each dimension.
-    pub xlo: f32, pub xhi: f32, pub ylo: f32, pub yhi: f32
+    pub xlo: f32,
+    pub xhi: f32,
+    pub ylo: f32,
+    pub yhi: f32,
 }
 
 impl Bounds {
@@ -56,7 +59,7 @@ impl SimData {
             positions: vec![],
             velocities: vec![],
             forces: vec![],
-            bounds: Bounds{ xlo, xhi, ylo, yhi}
+            bounds: Bounds { xlo, xhi, ylo, yhi },
         }
     }
 
@@ -117,7 +120,6 @@ impl SimData {
     }
 }
 
-
 // =================================================================================================
 //  Unit Tests.
 // =================================================================================================
@@ -129,14 +131,24 @@ mod tests {
 
     #[test]
     fn test_bounds() {
-        let bounds = Bounds{ xlo: 0.0, xhi: 2.5, ylo: -2.0, yhi: 3.25};
+        let bounds = Bounds {
+            xlo: 0.0,
+            xhi: 2.5,
+            ylo: -2.0,
+            yhi: 3.25,
+        };
         assert_eq!(bounds.width(), 2.5);
         assert_eq!(bounds.height(), 5.25);
     }
 
     #[test]
     fn test_simdata_construction_from_bounds() {
-        let bounds = Bounds{ xlo: 0.0, xhi: 2.5, ylo: -2.0, yhi: 2.0};
+        let bounds = Bounds {
+            xlo: 0.0,
+            xhi: 2.5,
+            ylo: -2.0,
+            yhi: 2.0,
+        };
         let simdata = SimData::from(bounds);
         assert_eq!(simdata.bounds.xlo, 0.0);
         assert_eq!(simdata.bounds.xhi, 2.5);

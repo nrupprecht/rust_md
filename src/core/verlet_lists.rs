@@ -1,4 +1,3 @@
-
 use crate::core::linked_cells::LinkedCells;
 use crate::core::simdata::SimData;
 
@@ -9,18 +8,26 @@ pub struct VerletLists {
     pub verlet_lists: Vec<(usize, Vec<usize>)>,
 
     /// The number of potential pairs in the verlet lists object.
-    num_pairs: usize
+    num_pairs: usize,
 }
-
 
 impl From<Vec<(usize, Vec<usize>)>> for VerletLists {
     fn from(value: Vec<(usize, Vec<usize>)>) -> Self {
         let num_pairs = value.iter().fold(0, |sum, x| sum + x.1.len());
-        VerletLists{ verlet_lists: value, num_pairs }
+        VerletLists {
+            verlet_lists: value,
+            num_pairs,
+        }
     }
 }
 
-pub fn check_neighbors(id1: usize, ids_to_check: &[usize], sim_data: &SimData, neighbors: &mut Vec<usize>, cutoff: f32) {
+pub fn check_neighbors(
+    id1: usize,
+    ids_to_check: &[usize],
+    sim_data: &SimData,
+    neighbors: &mut Vec<usize>,
+    cutoff: f32,
+) {
     for id2 in ids_to_check.iter().copied() {
         let rsqr = sim_data.distance_sqr_between(id1, id2);
         let rdiff = sim_data.radii[id1] + sim_data.radii[id2] + cutoff;
@@ -34,7 +41,7 @@ pub fn check_neighbors(id1: usize, ids_to_check: &[usize], sim_data: &SimData, n
 
 pub fn create_verlet_lists(sim_data: &SimData, cutoff: f32) -> VerletLists {
     let mut verlet_lists = Vec::new(); // : Vec<(i32, Vec<i32>)>
-    // If there are no particles, there is nothing to do.
+                                       // If there are no particles, there is nothing to do.
     if sim_data.is_empty() {
         return VerletLists::from(verlet_lists);
     }
@@ -46,15 +53,14 @@ pub fn create_verlet_lists(sim_data: &SimData, cutoff: f32) -> VerletLists {
 
     // Bin particles in the linked cells structure.
     let mut linked_cells = LinkedCells::new_for_simdata(&sim_data, max_radius);
-    for id in 0 .. sim_data.num_particles() {
+    for id in 0..sim_data.num_particles() {
         linked_cells.add_particle(&sim_data.positions.get(id).unwrap(), id);
     }
 
     // Create verlet lists from the linked cells.
-    for ix in 0 .. linked_cells.get_num_x() {
-        for iy in 0 .. linked_cells.get_num_y() {
+    for ix in 0..linked_cells.get_num_x() {
+        for iy in 0..linked_cells.get_num_y() {
             let cell = linked_cells.get_cell(ix, iy).unwrap();
-
 
             for i in 0..cell.particle_ids.len() {
                 let id1 = cell.particle_ids[i];
@@ -63,20 +69,50 @@ pub fn create_verlet_lists(sim_data: &SimData, cutoff: f32) -> VerletLists {
 
                 // Top row.
                 if let Some(cell) = linked_cells.get_adjusted_cell(ix, iy, -1, 1) {
-                    check_neighbors(id1, cell.particle_ids.as_slice(), &sim_data, &mut neighbors, cutoff);
+                    check_neighbors(
+                        id1,
+                        cell.particle_ids.as_slice(),
+                        &sim_data,
+                        &mut neighbors,
+                        cutoff,
+                    );
                 }
                 if let Some(cell) = linked_cells.get_adjusted_cell(ix, iy, 0, 1) {
-                    check_neighbors(id1, cell.particle_ids.as_slice(), &sim_data, &mut neighbors, cutoff);
+                    check_neighbors(
+                        id1,
+                        cell.particle_ids.as_slice(),
+                        &sim_data,
+                        &mut neighbors,
+                        cutoff,
+                    );
                 }
                 if let Some(cell) = linked_cells.get_adjusted_cell(ix, iy, 1, 1) {
-                    check_neighbors(id1, cell.particle_ids.as_slice(), &sim_data, &mut neighbors, cutoff);
+                    check_neighbors(
+                        id1,
+                        cell.particle_ids.as_slice(),
+                        &sim_data,
+                        &mut neighbors,
+                        cutoff,
+                    );
                 }
                 if let Some(cell) = linked_cells.get_adjusted_cell(ix, iy, -1, 0) {
-                    check_neighbors(id1, cell.particle_ids.as_slice(), &sim_data, &mut neighbors, cutoff);
+                    check_neighbors(
+                        id1,
+                        cell.particle_ids.as_slice(),
+                        &sim_data,
+                        &mut neighbors,
+                        cutoff,
+                    );
                 }
 
                 // Same cells.
-                check_neighbors(id1,&cell.particle_ids[i + 1 .. ], &sim_data, &mut neighbors, cutoff);
+                check_neighbors(
+                    id1,
+                    &cell.particle_ids[i + 1..],
+                    &sim_data,
+                    &mut neighbors,
+                    cutoff,
+                );
 
                 // If any neighbors of id1 were found, add them to the verlet lists.
                 if 0 < neighbors.len() {
@@ -88,7 +124,6 @@ pub fn create_verlet_lists(sim_data: &SimData, cutoff: f32) -> VerletLists {
 
     VerletLists::from(verlet_lists)
 }
-
 
 // =================================================================================================
 //  Unit Tests.
