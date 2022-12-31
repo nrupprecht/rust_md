@@ -16,8 +16,8 @@ pub struct LinkedCells {
     /// The low and high bounds in each dimension.
     pub bounds: Bounds,
 
-    cell_width: f32,
-    cell_height: f32,
+    cell_width: f64,
+    cell_height: f64,
 }
 
 impl LinkedCells {
@@ -30,18 +30,18 @@ impl LinkedCells {
     }
 
     /// Create a new set of linked cells object.
-    pub fn new(bounds: Bounds, target_size: f32) -> Self {
+    pub fn new(bounds: Bounds, target_size: f64) -> Self {
         // Calculate the number of x and y cells
         if target_size <= 0. {
             panic!("target size cannot be less than or equal to zero");
         }
 
-        let num_x = max(1, f32::floor(bounds.width() / target_size) as usize);
-        let num_y = max(1, f32::floor(bounds.height() / target_size) as usize);
+        let num_x = max(1, f64::floor(bounds.width() / target_size) as usize);
+        let num_y = max(1, f64::floor(bounds.height() / target_size) as usize);
         let num_cells = num_x * num_y;
 
-        let cell_width = bounds.width() / (num_x as f32);
-        let cell_height = bounds.height() / (num_y as f32);
+        let cell_width = bounds.width() / (num_x as f64);
+        let cell_height = bounds.height() / (num_y as f64);
 
         LinkedCells {
             num_x,
@@ -59,7 +59,7 @@ impl LinkedCells {
     }
 
     /// Create a new LinkedCells, taking its particle data from SimData.
-    pub fn new_for_simdata(sim_data: &SimData, target_size: f32) -> Self {
+    pub fn new_for_simdata(sim_data: &SimData, target_size: f64) -> Self {
         LinkedCells::new(sim_data.bounds, target_size)
     }
 
@@ -100,7 +100,7 @@ impl LinkedCells {
     }
 
     /// Get what cell a position falls inside.
-    pub fn get_cell_indices(&self, x: f32, y: f32) -> (usize, usize) {
+    pub fn get_cell_indices(&self, x: f64, y: f64) -> (usize, usize) {
         let ix = ((x - self.bounds.xlo) / self.cell_width) as usize;
         let iy = ((y - self.bounds.ylo) / self.cell_height) as usize;
         (ix, iy)
@@ -111,11 +111,13 @@ impl LinkedCells {
     /// Returns the cell into which the particle was added.
     pub fn add_particle(&mut self, position: &Position, id: usize) -> &mut Cell {
         let (ix, iy) = self.get_cell_indices(position.x, position.y);
-        let mut cell = self
-            .get_mut_cell(ix, iy)
-            .expect("A particle must belong to some cell");
-        cell.particle_ids.push(id);
-        cell
+        if let Some(cell) = self.get_mut_cell(ix, iy) {
+            cell.particle_ids.push(id);
+            cell
+        }
+        else {
+            panic!("a particle must belong to some cell");
+        }
     }
 }
 
