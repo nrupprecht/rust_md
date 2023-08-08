@@ -1,15 +1,16 @@
 use crate::core::simdata::SimData;
 use crate::core::vector::Vector;
 
+/// An object with the force trait needs to be able to calculate the force between two particles in a SimData.
 pub trait Force {
     fn calculate_forces(&self, sim_data: &mut SimData, id1: usize, id2: usize);
 }
 
 pub struct HardSphereForce {
-    pub(crate) repulsion: f64
+    pub(crate) repulsion: f64,
 }
 
-pub fn force_loop<Iterable>(force: &Box<dyn Force>, sim_data: &mut SimData, iterable: Iterable)
+pub fn force_loop<Iterable>(force: &dyn Force, sim_data: &mut SimData, iterable: Iterable)
     where Iterable: IntoIterator<Item=(usize, usize)>
 {
     // Clear the buffer of forces.
@@ -25,7 +26,6 @@ pub fn force_loop<Iterable>(force: &Box<dyn Force>, sim_data: &mut SimData, iter
 
 impl Force for HardSphereForce {
     fn calculate_forces(&self, sim_data: &mut SimData, id1: usize, id2: usize) {
-
         let rsqr = sim_data.distance_sqr_between(id1, id2);
         let sum_radii = sim_data.radii[id1] + sim_data.radii[id2];
         if rsqr < sum_radii * sum_radii {
@@ -38,6 +38,5 @@ impl Force for HardSphereForce {
             sim_data.forces[id1] -= unit * self.repulsion * overlap;
             sim_data.forces[id2] += unit * self.repulsion * overlap;
         }
-
     }
 }

@@ -1,3 +1,4 @@
+use std::any::Any;
 use crate::core::simdata::SimData;
 use crate::core::vector::Position;
 
@@ -9,7 +10,7 @@ pub trait Monitor {
     fn post_forces(&mut self, sim_data: &SimData) {}
     fn post_step(&mut self, sim_data: &SimData) {}
 
-    fn test(&self) {}
+    fn as_any(&self) -> &dyn Any;
 }
 
 pub struct PositionMonitor {
@@ -46,6 +47,12 @@ impl Monitor for PositionMonitor {
                 new_positions.push(sim_data.positions[i]);
             }
             self.positions.push(new_positions);
+
+            self.last_snapshot_time = Some(sim_data.simulation_time);
         }
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

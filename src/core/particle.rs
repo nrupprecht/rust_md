@@ -24,47 +24,48 @@ impl Particle {
     }
 
     /// Set the position of a particle. Allows for chaining.
-    pub fn set_position(&mut self, position: Vector) -> &mut Self {
+    pub fn with_position(&mut self, position: Vector) -> &mut Self {
         self.position = position;
         self
     }
 
-    pub fn with_position(&self, position: Vector) -> Particle {
-        let mut v = *self;
-        *v.set_position(position)
+    /// Set the x and y coordinates of the particle. Allows for chaining.
+    pub fn with_coords(&mut self, x: f64, y: f64) -> &mut Self {
+        self.position.x = x;
+        self.position.y = y;
+        self
     }
 
     /// Set the radius of a particle. Allows for chaining.
-    pub fn set_radius(&mut self, r: f64) -> &mut Self {
+    pub fn with_radius(&mut self, r: f64) -> &mut Self {
         self.radius = r;
         self
     }
 
-    pub fn with_radius(&self, r: f64) -> Particle {
-        let mut v = *self;
-        *v.set_radius(r)
-    }
-
     /// Set the mass of a particle. Allows for chaining.
-    pub fn set_mass(&mut self, mass: f64) -> &mut Self {
+    pub fn with_mass(&mut self, mass: f64) -> &mut Self {
         self.mass = mass;
         self
     }
 
-    pub fn with_mass(&self, m: f64) -> Particle {
-        let mut v = *self;
-        *v.set_mass(m)
-    }
-
     /// Set the velocity of a particle. Allows for chaining.
-    pub fn set_velocity(&mut self, velocity: Velocity) -> &mut Self {
+    pub fn with_velocity(&mut self, velocity: Velocity) -> &mut Self {
         self.velocity = velocity;
         self
     }
 
-    pub fn with_velocity(&self, velocity: Velocity) -> Particle {
-        let mut v = *self;
-        *v.set_velocity(velocity)
+    /// Set the components of velocity. Allows for chaining.
+    pub fn with_velocity_components(&mut self, x: f64, y: f64) -> &mut Self {
+        self.velocity.x = x;
+        self.velocity.y = y;
+        self
+    }
+
+    pub fn with_density(&mut self, density: f64) -> &mut Self {
+        let area = std::f64::consts::PI * self.radius * self.radius;
+        let mut p = *self;
+        self.mass = density * area;
+        self
     }
 }
 
